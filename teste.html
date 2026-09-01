@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carta Selada CSS</title>
+  <style>
+    /* Reset básico: Garante que margens e tamanhos fiquem uniformes em qualquer navegador */
+    * {
+      box-sizing: border-box; /* Inclui bordas e paddings no cálculo da largura/altura total */
+      margin: 0;              /* Remove margens padrão dos elementos */
+      padding: 0;             /* Remove espaçamentos internos padrão */
+    }
+
+    /* Estilização do fundo e centralização da página */
+    body {
+      background-color: #f0e6d2; /* Cor de fundo num tom bege vintage */
+      display: flex;             /* Ativa o Layout Flexbox */
+      justify-content: center;   /* Centraliza o envelope horizontalmente */
+      align-items: center;       /* Centraliza o envelope verticalmente */
+      min-height: 100vh;         /* Ocupa 100% da altura da tela do navegador */
+      font-family: sans-serif;   /* Define uma fonte padrão sem serifa */
+    }
+
+    /* Esconde o controle do checkbox sem desativar sua funcionalidade no HTML */
+    #card-toggle {
+      display: none; /* O checkbox fica oculto porque o <label> cuidará do clique */
+    }
+
+    /* Envoltório externo que funciona como o botão de clique (Label) */
+    .envelope-wrapper {
+      position: relative; /* Define ponto de referência para elementos com 'position: absolute' */
+      cursor: pointer;    /* Muda o ponteiro do mouse para a 'mãozinha' indicando interatividade */
+    }
+
+    /* A base/corpo do envelope */
+    .envelope {
+      position: relative;
+      width: 300px;                      /* Largura do envelope */
+      height: 200px;                     /* Altura do envelope */
+      background-color: #d9a05b;         /* Cor do fundo interno da carta */
+      border-radius: 0 0 10px 10px;      /* Arredonda levemente apenas os cantos inferiores */
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* Sombra suave abaixo do envelope */
+    }
+
+    /* Aba Superior do Envelope (Triângulo que abre para cima) */
+    .envelope::before {
+      content: "";          /* Necessário para que o pseudoelemento exista na tela */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;             /* Usa bordas espessas em vez de largura para criar um formato de triângulo */
+      height: 0;
+      border-left: 150px solid transparent;  /* Metade da largura total (lado esquerdo transparente) */
+      border-right: 150px solid transparent; /* Metade da largura total (lado direito transparente) */
+      border-top: 110px solid #bc8342;       /* Triângulo apontando para baixo (cor da aba) */
+      transform-origin: top;                 /* Fixa a dobradiça na borda superior para poder girar */
+      transition: transform 0.4s ease-in-out 0.2s, z-index 0.2s; /* Animação de rotação e camada */
+      z-index: 3;                            /* Começa na frente do papel da carta */
+    }
+
+    /* Dobras Laterais e Inferior (Efeito de bolso do envelope) */
+    .pocket {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      /* O truque das bordas cria o triângulo inferior e as laterais sobrepostas */
+      border-left: 150px solid #ce934d;  /* Dobra esquerda */
+      border-right: 150px solid #ce934d; /* Dobra direita */
+      border-bottom: 100px solid #b27b3b;/* Dobra inferior (mais escura) */
+      border-radius: 0 0 10px 10px;      /* Acompanha os cantos inferiores arredondados */
+      z-index: 3;                        /* Fica por cima da carta para escondê-la no início */
+    }
+
+    /* O papel interno (A mensagem) */
+    .letter {
+      position: absolute;
+      bottom: 10px;                      /* Posiciona o papel bem rente ao fundo do envelope */
+      left: 15px;                        /* Margem lateral interna */
+      width: 270px;                      /* Um pouco menor que a largura do envelope */
+      height: 180px;                     /* Altura do papel */
+      background: #ffffff;               /* Cor do papel */
+      border-radius: 6px;                /* Cantos ligeiramente arredondados no papel */
+      padding: 20px;                     /* Espaçamento do texto interno */
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);/* Sombra leve no papel para dar profundidade */
+      transition: transform 0.5s ease-in-out; /* Transição suave para o movimento de subida */
+      z-index: 2;                        /* Fica entre o fundo (z:1) e a frente do bolso (z:3) */
+    }
+
+    /* Estilização do texto da carta */
+    .letter p {
+      color: #333;        /* Cor do texto em cinza escuro */
+      font-size: 14px;    /* Tamanho da fonte */
+      line-height: 1.5;   /* Altura entre as linhas para melhorar a leitura */
+    }
+
+    /* O Selo de Cera vermelho com ícone */
+    .wax-seal {
+      position: absolute;
+      top: 85px;                         /* Alinha na ponta da aba do envelope */
+      left: 50%;                         /* Move até a metade da largura */
+      transform: translateX(-50%);       /* Centraliza perfeitamente no eixo horizontal */
+      width: 45px;                       /* Diâmetro do selo */
+      height: 45px;
+      background-color: #900C3F;         /* Cor vermelho-carmim da cera */
+      border-radius: 50%;                /* Torna o formato completamente circular */
+      border: 3px solid #720931;         /* Borda mais escura para criar relevo */
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Sombra do selo sob o envelope */
+      display: flex;                     /* Ativa flexbox no interior do selo */
+      justify-content: center;           /* Centraliza a estrela no meio do selo (horizontal) */
+      align-items: center;               /* Centraliza a estrela no meio do selo (vertical) */
+      color: #FFD700;                    /* Cor dourada para o ícone (★) */
+      font-weight: bold;                 /* Deixa o ícone mais espesso */
+      font-size: 18px;                   /* Tamanho do ícone */
+      z-index: 4;                        /* Camada mais alta (fica no topo de tudo) */
+      transition: opacity 0.3s ease, transform 0.3s ease; /* Transição para sumir suavemente */
+    }
+
+    /* ======================================================
+       ESTADOS DE ANIMAÇÃO AO CLICAR (SELETOR :checked)
+       ====================================================== */
+
+    /* 1. Animação do Selo: Fica transparente e diminui de tamanho */
+    #card-toggle:checked + .envelope-wrapper .wax-seal {
+      opacity: 0;                             /* Desaparece da tela */
+      transform: translateX(-50%) scale(0.5); /* Diminui de tamanho enquanto mantém a centralização */
+    }
+
+    /* 2. Animação da Aba: Gira 180 graus no eixo X (abre para cima) */
+    #card-toggle:checked + .envelope-wrapper .envelope::before {
+      transform: rotateX(180deg); /* Faz a aba dobrar para trás/cima */
+      z-index: 1;                 /* Vai para trás do papel assim que abre totalmente */
+      transition: transform 0.4s ease-in-out, z-index 0.1s 0.2s; /* Sincroniza abertura e camada */
+    }
+
+    /* 3. Animação do Papel: Desliza verticalmente para fora do envelope */
+    #card-toggle:checked + .envelope-wrapper .letter {
+      transform: translateY(-130px); /* Move o papel 130px para cima */
+      z-index: 2;                    /* Garante que fique visível saindo do bolso */
+      transition: transform 0.5s ease-in-out 0.3s; /* Delay de 0.3s para esperar a aba abrir */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Checkbox oculto que controla o estado clicado/não clicado -->
+  <input type="checkbox" id="card-toggle">
+  
+  <!-- O Label vincula o clique da área do envelope ao checkbox acima -->
+  <label for="card-toggle" class="envelope-wrapper">
+    <div class="envelope">
+      <div class="letter">
+        <p><strong>Olá!</strong></p>
+        <p>Sua mensagem especial aparece aqui assim que o envelope é aberto.</p>
+      </div>
+      <div class="pocket"></div>
+      <div class="wax-seal">★</div>
+    </div>
+  </label>
+
+</body>
+</html>
