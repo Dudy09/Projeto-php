@@ -41,7 +41,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Meu menu</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body style="background: linear-gradient(135deg, <?= $segunda_cor ?>, <?= $primeira_cor ?>);">
@@ -62,10 +62,10 @@
               Cadastros
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="Cadastro/Cliente.php">Cliente</a></li>
-              <li><a class="dropdown-item" href="Cadastro/Funcionario.php">Funcionario</a></li>
-              <li><a class="dropdown-item" href="Cadastro/Fornecedor.php">Fornecedor</a></li>
-              <li><a class="dropdown-item" href="Cadastro/Produto.php">Produto</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Cadastro/Cliente.php">Cliente</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Cadastro/Funcionario.php">Funcionario</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Cadastro/Fornecedor.php">Fornecedor</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Cadastro/Produto.php">Produto</a></li>
             </ul>
           </li>
 
@@ -74,10 +74,10 @@
               Consulta
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="Consulta/Cliente_consulta.php">Cliente</a></li>
-              <li><a class="dropdown-item" href="Consulta/Funcionario.php">Funcionario</a></li>
-              <li><a class="dropdown-item" href="Consulta/Fornecedor.php">Fornecedor</a></li>
-              <li><a class="dropdown-item" href="Consulta/Produto.php">Produto</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Cliente_consulta.php">Cliente</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Funcionario.php">Funcionario</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Fornecedor.php">Fornecedor</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Produto.php">Produto</a></li>
             </ul>
           </li>
 

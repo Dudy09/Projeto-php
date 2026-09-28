@@ -52,10 +52,9 @@
   <?php
       if(!empty($_POST))
       { 
-        $cliente = array($_POST['nome'], " - ", $_POST['cpf'], " - ", $_POST['rg'], " - ", $_POST['dt'], " - ", $_POST['cep'], " - ", $_POST['endereco'], " - ", $_POST['numero'], " - ", $_POST['complemento'], " - ", $_POST['bairro'], " - ", $_POST['cidade'], " - ", $_POST['estado'], " - ", $_POST['tel'], " - ", $_POST['email'], ";", "\n");
         
-
-
+        $cliente = array($_POST['nome'], ", ", $_POST['cpf'], ", ", $_POST['rg'], ", ", $_POST['dt'], ", ", $_POST['cep'], ", ", $_POST['endereco'], ", ", $_POST['numero'], ", ", $_POST['complemento'], ", ", $_POST['bairro'], ", ", $_POST['cidade'], ", ", $_POST['estado'], ", ", $_POST['tel'], ", ", $_POST['email'], ";", "\n");
+        
         $dir = "../Dados/cliente.txt";
 		
 		    file_put_contents($dir, $cliente,  FILE_APPEND | LOCK_EX);

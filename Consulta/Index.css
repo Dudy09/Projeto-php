@@ -1,0 +1,391 @@
+:root {
+    --bg: #f2f4f7;
+    --white: #ffffff;
+    --primary: #4a63d2;
+    --primary-dark: #2c3e50;
+    --accent: #529ed0;
+    --text: #1b2534;
+    --muted: #64748b;
+    --border: #d8dee5;
+    --card-bg: #fffdf9;
+    --card-border: #e8dec9;
+    --card-label: #9e5632;
+    --code-bg: #2d2524;
+    --code-key: #e8b4b8;
+    --code-str: #a3c9a8;
+    --code-func: #e6c594;
+    --code-comment: #8c7b70;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Layout principal */
+.topo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary), #4a63d2);
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+}
+
+.navbar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 24px;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+.navbar-search {
+    flex: 1;
+    min-width: 170px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background-color: #f8fafc;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.navbar-search:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--white);
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-menu.menu1 {
+    background-color: var(--primary-dark);
+}
+
+.menu-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 16px;
+    margin: 0;
+    list-style: none;
+}
+
+.menu-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 14px;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.menu-link:hover {
+    background-color: var(--accent);
+    color: var(--primary-dark);
+}
+
+.Conta_Conta {
+    background-color: var(--accent);
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.Conta_Conta:hover {
+    background-color: #318ecc;
+    transform: translateY(-1px);
+}
+
+.page-body {
+    max-width: 800px;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.layout-grid {
+    grid-template-columns: minmax(0, 1.3fr) 360px;
+    gap: 28px;
+    margin-top: 28px;
+}
+
+.content-main {
+    display: grid;
+    gap: 24px;
+}
+
+.main-card,
+.sidebar-box {
+    background-color: var(--white);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 18px 40px rgba(17, 23, 34, 0.06);
+}
+
+.headline-text h1 {
+    margin: 0 0 16px;
+    font-size: 2rem;
+    line-height: 1.1;
+    color: #111827;
+}
+
+.headline-text ul {
+    padding-left: 20px;
+}
+
+.main-summary {
+    margin-top: 24px;
+}
+
+.sidebar {
+    position: relative;
+}
+
+.sidebar-box {
+    position: sticky;
+    top: 124px;
+}
+
+.sidebar-box h2 {
+    margin: 0 0 18px;
+    font-size: 1.5rem;
+    color: #111827;
+}
+
+/* Estilos do bloco de funções */
+.box-card {
+    position: relative;
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-bottom: 4px solid #c4b79b;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(74, 62, 61, 0.06);
+}
+
+.tape-strip {
+    position: absolute;
+    top: -10px;
+    left: 40px;
+    width: 80px;
+    height: 18px;
+    background-color: rgba(230, 197, 148, 0.85);
+    border-left: 2px dashed rgba(158, 86, 50, 0.3);
+    border-right: 2px dashed rgba(158, 86, 50, 0.3);
+    transform: rotate(-1.5deg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.box-header {
+    margin-top: 4px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #f7f3ed;
+    padding-bottom: 8px;
+}
+
+.box-title {
+    margin: 0;
+    font-size: 36.63px;
+    color: var(--card-label);
+    font-weight: 700;
+}
+
+.box-subtitle {
+    margin: 2px 0 0 0;
+    font-size: 12pt;
+    color: #8c7b70;
+}
+
+.func-item {
+    background: #f7f3ed;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.func-toggle {
+    cursor: pointer;
+    font-weight: bold;
+    outline: none;
+    padding: 5px 0;
+}
+
+.func-content {
+    padding-top: 10px;
+}
+
+.func-table {
+    display: table;
+    width: 100%;
+}
+
+.func-cell-left,
+.func-cell-right {
+    display: table-cell;
+}
+
+.func-cell-right {
+    text-align: right;
+}
+
+.func-name {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: var(--card-label);
+    font-size: 10pt;
+}
+
+.func-desc {
+    font-size: 8.5pt;
+    color: #4a3e3d;
+    margin: 3px 0 6px 0;
+}
+
+.badge-string {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 7.5pt;
+    font-weight: bold;
+    background-color: #e8b4b8;
+    color: #5c3236;
+}
+
+.code-container {
+    background-color: var(--code-bg);
+    color: #f7f3ed;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 8.5pt;
+    margin-top: 6px;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.code-keyword {
+    color: var(--code-key);
+    font-weight: bold;
+}
+
+.code-str {
+    color: var(--code-str);
+}
+
+.code-func {
+    color: var(--code-func);
+}
+
+.code-comment {
+    color: var(--code-comment);
+}
+
+/* Rodapé */
+.baixo {
+    margin-top: 40px;
+}
+
+.cartão {
+    background-color: var(--white);
+    height: 235.2px;
+    width: 300px;
+    border-radius: 16px;
+    margin-top: 50px;
+    padding: 20px;
+}
+
+.sub_titulo {
+    font-size: 14px;
+    color: #000;
+    margin: 0 0 8px;
+}
+
+.footer {
+    width: 100%;
+}
+
+.footer_main {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.footer label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.footer input,
+.footer textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #999;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.footer textarea {
+    font-family: Arial, sans-serif;
+}
+
+.footer button {
+    background-color: #3b506b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+}
