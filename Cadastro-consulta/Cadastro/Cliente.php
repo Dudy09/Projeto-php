@@ -1,31 +1,28 @@
 <?php
-  include 'funções.php';
+  session_start();
+  include __DIR__ . '/funções.php';
 
-  $campos = ['nome', 'cpf', 'rg', 'dt', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tel', 'email'];
-  $obrigatorios = array_diff($campos, ['complemento']);
-
-  $enviado  = !empty($_POST);$faltando = false;
   $erro     = null;
 
-  if ($enviado) {
+  if (isset($_POST['limpar'])) {
+    unset($_SESSION['cliente_form']);
+  } elseif (!empty($_POST)) {
+    $erro = validarCPF($_POST['cpf'] ?? '');
 
-    $cliente = array($_POST['nome'], ", ", $_POST['cpf'], ", ", $_POST['rg'], ", ", $_POST['dt'], ", ", $_POST['cep'], ", ", $_POST['endereco'], ", ", $_POST['numero'], ", ", $_POST['complemento'], ", ", $_POST['bairro'], ", ", $_POST['cidade'], ", ", $_POST['estado'], ", ", $_POST['tel'], ", ", $_POST['email'], ";", "\n");
+    if ($erro) {
+      $_SESSION['cliente_form'] = $_POST;
+    } else {
+      unset($_SESSION['cliente_form']);
+      echo "<script>alert('Aviso: Operação realizada com sucesso!');</script>";
+      $cliente = array($_POST['nome'], ", ", $_POST['cpf'], ", ", $_POST['rg'], ", ", $_POST['dt'], ", ", $_POST['cep'], ", ", $_POST['endereco'], ", ", $_POST['numero'], ", ", $_POST['complemento'], ", ", $_POST['bairro'], ", ", $_POST['cidade'], ", ", $_POST['estado'], ", ", $_POST['tel'], ", ", $_POST['email'], ";", "\n");
 
-    $dir = "../Dados/cliente.txt";
+      $dir = "../Dados/cliente.txt";
 
-    file_put_contents($dir,$cliente,  FILE_APPEND | LOCK_EX);
-
-    foreach ($obrigatorios as $c) {
-      if (!isset($_POST[$c]) || trim($_POST[$c]) === '') {
-        $faltando = true;
-        break;
-      }
-    }
-
-    if (!$faltando) {
-      $erro = validarCPF($_POST['cpf']);
+      file_put_contents($dir, $cliente, FILE_APPEND | LOCK_EX);
     }
   }
+
+  $dadosFormulario = $_SESSION['cliente_form'] ?? [];
 
   if (!function_exists('esc')) {
     function esc($v) {
@@ -58,67 +55,71 @@
                 <section class="carta-form">
                     <h1>Destinatário</h1>
 
+                  <?php if ($erro): ?>
+                    <div class="alert alert-danger" role="alert">CPF inválido. Verifique os dígitos e tente novamente.</div>
+                  <?php endif; ?>
+
                     <form action="#" method="POST" class="needs-validation form-carta" novalidate>
                         <div class="campo campo-full">
                             <label class="form-label">Nome: </label>
-                            <input class="form-control" type="text" id="nome" name="nome" required>
+                            <input class="form-control" type="text" id="nome" name="nome" value="<?= esc($dadosFormulario['nome'] ?? '') ?>" required>
                         </div>
 
                         <div class="campo">
                             <label class="form-label">CPF: </label>
-                            <input class="form-control" type="number" id="cpf" name="cpf" placeholder="000000000/00" required>
+                            <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{11}" maxlength="11" id="cpf" name="cpf" value="<?= esc($dadosFormulario['cpf'] ?? '') ?>" placeholder="00000000000" required>
                         </div>
                         <div class="campo">
                             <label class="form-label">RG: </label>
-                            <input class="form-control" type="number" id="rg" name="rg" placeholder="00.000.000-0" required>
+                            <input class="form-control" type="number" id="rg" name="rg" value="<?= esc($dadosFormulario['rg'] ?? '') ?>" placeholder="00.000.000-0" required>
                         </div>
                         <div class="campo">
                             <label class="form-label">Data Nascimento: </label>
-                            <input class="form-control" type="date" id="dt" name="dt" required>
+                            <input class="form-control" type="date" id="dt" name="dt" value="<?= esc($dadosFormulario['dt'] ?? '') ?>" required>
                         </div>
 
                         <div class="campo">
                             <label class="form-label">CEP: </label>
-                            <input class="form-control" type="text" id="cep" name="cep" maxlength="8" placeholder="00000000" required>
+                            <input class="form-control" type="text" id="cep" name="cep" value="<?= esc($dadosFormulario['cep'] ?? '') ?>" maxlength="8" placeholder="00000000" required>
                         </div>
                         <div class="campo campo-2">
                             <label class="form-label">Endereço: </label>
-                            <input class="form-control" type="text" id="endereco" name="endereco" readonly required>
+                            <input class="form-control" type="text" id="endereco" name="endereco" value="<?= esc($dadosFormulario['endereco'] ?? '') ?>" readonly required>
                         </div>
 
                         <div class="campo">
                             <label class="form-label">Número: </label>
-                            <input class="form-control" type="number" id="numero" name="numero" placeholder="000000" required>
+                            <input class="form-control" type="number" id="numero" name="numero" value="<?= esc($dadosFormulario['numero'] ?? '') ?>" placeholder="000000" required>
                         </div>
                         <div class="campo">
                             <label class="form-label">Complemento: </label>
-                            <input class="form-control" type="text" id="complemento" name="complemento">
+                            <input class="form-control" type="text" id="complemento" name="complemento" value="<?= esc($dadosFormulario['complemento'] ?? '') ?>">
                         </div>
                         <div class="campo">
                             <label class="form-label">Bairro: </label>
-                            <input class="form-control" type="text" id="bairro" name="bairro" readonly required>
+                            <input class="form-control" type="text" id="bairro" name="bairro" value="<?= esc($dadosFormulario['bairro'] ?? '') ?>" readonly required>
                         </div>
 
                         <div class="campo">
                             <label class="form-label">Cidade: </label>
-                            <input class="form-control" type="text" id="cidade" name="cidade" readonly required>
+                            <input class="form-control" type="text" id="cidade" name="cidade" value="<?= esc($dadosFormulario['cidade'] ?? '') ?>" readonly required>
                         </div>
                         <div class="campo">
                             <label class="form-label">Estado: </label>
-                            <input class="form-control" type="text" id="estado" name="estado" readonly required>
+                            <input class="form-control" type="text" id="estado" name="estado" value="<?= esc($dadosFormulario['estado'] ?? '') ?>" readonly required>
                         </div>
                         <div class="campo">
                             <label class="form-label">Telefone: </label>
-                            <input class="form-control" type="number" id="tel" name="tel" required>
+                            <input class="form-control" type="number" id="tel" name="tel" value="<?= esc($dadosFormulario['tel'] ?? '') ?>" required>
                         </div>
 
                         <div class="campo campo-2">
                             <label class="form-label">Email: </label>
-                            <input class="form-control" type="email" id="email" name="email" required>
+                            <input class="form-control" type="email" id="email" name="email" value="<?= esc($dadosFormulario['email'] ?? '') ?>" required>
                         </div>
                         <div class="botoes">
                             <input type="submit" value="Cadastrar" class="btn btn-primary">
-                            <input type="reset" value="Limpar" class="btn btn-warning">
+                            <button type="submit" name="limpar" value="1" class="btn btn-warning">Limpar</button>
                         </div>
                     </form>
                 </section>
@@ -154,6 +155,10 @@
       }
 
       form.addEventListener('submit', function(event) {
+        if (event.submitter && event.submitter.name === 'limpar') {
+          return;
+        }
+
         if (!form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();

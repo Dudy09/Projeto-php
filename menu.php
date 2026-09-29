@@ -75,9 +75,9 @@
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Cliente_consulta.php">Cliente</a></li>
-              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Funcionario.php">Funcionario</a></li>
-              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Fornecedor.php">Fornecedor</a></li>
-              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Produto.php">Produto</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Funcionario_consulta.php">Funcionario</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Fornecedor_consulta.php">Fornecedor</a></li>
+              <li><a class="dropdown-item" href="Cadastro-consulta/Consulta/Produto_consulta.php">Produto</a></li>
             </ul>
           </li>
 
