@@ -1,4 +1,4 @@
-# Projeto - Sistemas Web 🌐
+# Projeto - Sistemas Web
 
 Este projeto tem como objetivo demonstrar os conhecimentos adquiridos durante as aulas da disciplina de Sistemas Web, reunindo em formato de portfólio todas as atividades e exercícios propostos pelo professor Alessandro.
 
