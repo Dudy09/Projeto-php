@@ -9,30 +9,34 @@
 
 <body>
   <h1 class="bg-primary text-white text-center py-3">Consulta de cliente</h1>
-  
+
+  <div class="container mb-5">
+    <a href="../Cadastro/Cliente.php" class="btn btn-outline-primary mb-4">← Voltar ao cadastro</a>
+
     <?php
       $dir = "../Dados/cliente.txt";
 
+      $rotulos = ['Nome', 'CPF', 'RG', 'Data Nasc.', 'CEP', 'Endereço', 'Número', 'Complem.', 'Bairro', 'Cidade', 'Estado', 'Telefone', 'E-mail'];
+
       if (file_exists($dir)) {
-          $conteudo = file_get_contents($dir);
+          $linhas = file($dir, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-          // Transforma a string de volta em um array usando o " - " como separador
-          $dados = explode(" - ", $conteudo);
+          echo "<h3>Clientes cadastrados (" . count($linhas) . ")</h3>";
 
-          echo "<h3>Dados do Cliente</h3>";
-          echo "<p><strong>Nome:</strong> "        . htmlspecialchars($dados[0]  ?? '') . "</p>";
-          echo "<p><strong>CPF:</strong> "         . htmlspecialchars($dados[1]  ?? '') . "</p>";
-          echo "<p><strong>RG:</strong> "          . htmlspecialchars($dados[2]  ?? '') . "</p>";
-          echo "<p><strong>Data Nasc.:</strong> "  . htmlspecialchars($dados[3]  ?? '') . "</p>";
-          echo "<p><strong>CEP:</strong> "         . htmlspecialchars($dados[4]  ?? '') . "</p>";
-          echo "<p><strong>Endereço:</strong> "    . htmlspecialchars($dados[5]  ?? '') . "</p>";
-          echo "<p><strong>Número:</strong> "      . htmlspecialchars($dados[6]  ?? '') . "</p>";
-          echo "<p><strong>Complem.:</strong> "    . htmlspecialchars($dados[7]  ?? '') . "</p>";
-          echo "<p><strong>Bairro:</strong> "      . htmlspecialchars($dados[8]  ?? '') . "</p>";
-          echo "<p><strong>Cidade:</strong> "      . htmlspecialchars($dados[9]  ?? '') . "</p>";
-          echo "<p><strong>Estado:</strong> "      . htmlspecialchars($dados[10] ?? '') . "</p>";
-          echo "<p><strong>Telefone:</strong> "    . htmlspecialchars($dados[11] ?? '') . "</p>";
-          echo "<p><strong>E-mail:</strong> "      . htmlspecialchars($dados[12] ?? '') . "</p>";
+          foreach ($linhas as $i => $linha) {
+              $linha = rtrim(trim($linha), ';');
+
+              $dados = explode(", ", $linha);
+
+              echo '<div class="card shadow-sm mb-3"><div class="card-body">';
+              echo '<h5 class="card-title">Cliente ' . ($i + 1) . '</h5>';
+
+              foreach ($rotulos as $n => $rotulo) {
+                  echo "<p class='mb-1'><strong>$rotulo:</strong> " . htmlspecialchars($dados[$n] ?? '') . "</p>";
+              }
+
+              echo '</div></div>';
+          }
       } else {
           echo '<p class="aviso">Arquivo não encontrado.</p>';
       }
