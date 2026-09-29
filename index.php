@@ -26,7 +26,7 @@ if(!empty($_POST))
 
     <title>Papers Please Login</title>
 
-    <link rel="stylesheet" href="style-login.css">
+    <link rel="stylesheet" href="css/style-login.css">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>

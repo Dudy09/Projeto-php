@@ -4,10 +4,10 @@ function validarCPF($cpf) {
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
     $tamanho = strlen($cpf);
     
-    if($tamanho != 11)
+    if($tamanho != 11 || preg_match('/^(\d)\1{10}$/', $cpf))
     {
-        $erro = true;
-        return $erro;
+        $valor = true;
+        return $valor;
     }
     else
     {
@@ -41,15 +41,15 @@ function validarCPF($cpf) {
 
         if($dgt1 != $n[10] || $dgt2 != $n[11])
         {
-            $erro = true;
+            $valor = true;
         }
         
         else
         {
-            $erro = false;
+            $valor = false;
         }
 
-        return $erro;
+        return $valor;
     }
 }
 
