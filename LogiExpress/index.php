@@ -147,6 +147,7 @@ if (!isset($_SESSION['acoes']))
 </head>
 <body>
 
+
 	<main class="fundo-principal Vh-1 Vw-1">
 
 		<aside class="barra-lateral Vh-1 Vw15">

@@ -19,7 +19,7 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK)
     $imagem = $_FILES['imagem'];
     $extensao = strtolower(pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION));
 
-    if ($extensao != 'jpg' && $extensao != 'jpeg' && $extensao != 'png' && $extensao != 'gif')
+    if ($extensao != 'jpg' && $extensao != 'jpeg' && $extensao != 'png' && $extensao != 'gif' && $extensao != 'webp')
     {
         $erro = "Apenas arquivos JPG, JPEG, PNG e GIF são permitidos.";
     }
@@ -61,7 +61,7 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK)
     }
 }
 
-$imagensGaleria = is_dir($pasta) ? (glob($pasta . '*.{jpg,jpeg,png,gif}', GLOB_BRACE) ?: []) : [];
+$imagensGaleria = is_dir($pasta) ? (glob($pasta . '*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE) ?: []) : [];
 
 ?>
 
@@ -74,6 +74,7 @@ $imagensGaleria = is_dir($pasta) ? (glob($pasta . '*.{jpg,jpeg,png,gif}', GLOB_B
     <link rel="icon" type="image/png" href="./caminho-da-sua-imagem.png">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="corpo-pagina">
     <input type="radio" name="navegacao" id="tab-1" checked>
     <input type="radio" name="navegacao" id="tab-2">
@@ -81,6 +82,9 @@ $imagensGaleria = is_dir($pasta) ? (glob($pasta . '*.{jpg,jpeg,png,gif}', GLOB_B
 
     <aside class="menu-lateral">
         <div class="organizacao-menu">
+            <button onclick="window.history.back()" style="background: none; border: none; width: 80px; display: flex;"> 
+                    <p style="font-size: 24px;"> ← </p>
+            </button>
                 <div class="logo">Seja bem vindo a sua galeria</div>
                 <label for="tab-1" class="lbl-1">Upload de arquivos</label>
                 <label for="tab-2" class="lbl-2">Galeria</label>
