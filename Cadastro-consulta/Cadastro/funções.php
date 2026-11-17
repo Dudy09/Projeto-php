@@ -140,9 +140,10 @@ function enviarImagem($campo, $pasta) {
         mkdir($pasta, 0755, true);
     }
 
-    // Nome novo (data + código aleatório) para nunca sobrescrever outro arquivo
+    // Usa a data de envio como base do nome e um sufixo para evitar sobrescritas
     // A extensão vem do tipo real da imagem, não do nome enviado pelo usuário
-    $novoNome = date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.' . $tiposPermitidos[$info['mime']];
+    $dataEnvio = new DateTimeImmutable('now', new DateTimeZone('America/Sao_Paulo'));
+    $novoNome = $dataEnvio->format('Y-m-d-H-i-s') . '-' . bin2hex(random_bytes(4)) . '.' . $tiposPermitidos[$info['mime']];
 
     if (!move_uploaded_file($arquivo['tmp_name'], rtrim($pasta, '/\\') . '/' . $novoNome)) {
         return array(null, 'Erro ao salvar a imagem.');

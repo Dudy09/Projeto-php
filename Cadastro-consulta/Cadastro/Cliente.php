@@ -3,23 +3,45 @@
   include __DIR__ . '/funções.php';
 
   $erro     = null;
+  $erroCampos = null;
+  $erroCep = null;
+  $erroData = null;
+  $erroEmail = null;
   $erroFoto = null;
+  $erroGravacao = null;
 
   if (isset($_POST['limpar'])) {
     unset($_SESSION['cliente_form']);
   } elseif (!empty($_POST)) {
-    $erro = validarCPF($_POST['cpf'] ?? '');
+    $camposObrigatorios = array('nome', 'cpf', 'rg', 'dt', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'tel', 'email');
+    foreach ($camposObrigatorios as $campo) {
+      $valor = $_POST[$campo] ?? '';
+      if (!is_scalar($valor) || trim((string)$valor) === '') {
+        $erroCampos = true;
+        break;
+      }
+    }
 
-    if (!$erro) {
+    if (!$erroCampos) {
+      $erro = validarCPF($_POST['cpf']);
+      $cep = trim((string)$_POST['cep']);
+      $erroCep = preg_match('/^\d{8}$/', $cep) !== 1;
+
+      $dataNascimento = trim((string)$_POST['dt']);
+      $dataValida = DateTime::createFromFormat('!Y-m-d', $dataNascimento);
+      $erroData = !$dataValida || $dataValida->format('Y-m-d') !== $dataNascimento;
+
+      $email = trim((string)$_POST['email']);
+      $erroEmail = filter_var($email, FILTER_VALIDATE_EMAIL) === false;
+    }
+
+    if (!$erroCampos && !$erro && !$erroCep && !$erroData && !$erroEmail) {
       list($foto, $erroFoto) = enviarImagem('foto', __DIR__ . '/../Uploads/clientes/');
     }
 
-    if ($erro || $erroFoto) {
+    if ($erroCampos || $erro || $erroCep || $erroData || $erroEmail || $erroFoto) {
       $_SESSION['cliente_form'] = $_POST;
     } else {
-      unset($_SESSION['cliente_form']);
-      echo "<script>alert('Aviso: Operação realizada com sucesso!');</script>";
-
       $camposRegistro = array('nome', 'cpf', 'rg', 'dt', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tel', 'email');
       $valores = array();
       foreach ($camposRegistro as $campo) {
@@ -28,9 +50,21 @@
       $valores[] = $foto;
       $registro = implode(", ", $valores) . ";\n";
 
-      $dir = "../Dados/cliente.txt";
+      $diretorioDados = __DIR__ . '/../Dados';
+      if (!is_dir($diretorioDados) && !mkdir($diretorioDados, 0755, true) && !is_dir($diretorioDados)) {
+        $erroGravacao = 'Não foi possível criar a pasta de dados do cadastro.';
+      }
 
-      file_put_contents($dir, $registro, FILE_APPEND | LOCK_EX);
+      if (!$erroGravacao && file_put_contents($diretorioDados . '/cliente.txt', $registro, FILE_APPEND | LOCK_EX) === false) {
+        $erroGravacao = 'Não foi possível salvar o cadastro. Verifique as permissões da pasta Dados.';
+      }
+
+      if ($erroGravacao) {
+        $_SESSION['cliente_form'] = $_POST;
+      } else {
+        unset($_SESSION['cliente_form']);
+        echo "<script>alert('Aviso: Operação realizada com sucesso!');</script>";
+      }
     }
   }
 
@@ -69,6 +103,21 @@
                   <?php if ($erro): ?>
                     <div class="alert alert-danger" role="alert">CPF inválido. Verifique os dígitos e tente novamente.</div>
                   <?php endif; ?>
+                  <?php if ($erroCampos): ?>
+                    <div class="alert alert-danger" role="alert">Preencha todos os campos obrigatórios.</div>
+                  <?php endif; ?>
+                  <?php if ($erroCep): ?>
+                    <div class="alert alert-danger" role="alert">CEP inválido. Informe os 8 dígitos numéricos.</div>
+                  <?php endif; ?>
+                  <?php if ($erroData): ?>
+                    <div class="alert alert-danger" role="alert">Data de nascimento inválida.</div>
+                  <?php endif; ?>
+                  <?php if ($erroEmail): ?>
+                    <div class="alert alert-danger" role="alert">E-mail inválido.</div>
+                  <?php endif; ?>
+                  <?php if ($erroGravacao): ?>
+                    <div class="alert alert-danger" role="alert"><?= esc($erroGravacao) ?></div>
+                  <?php endif; ?>
 
                     <form action="#" method="POST" class="needs-validation form-carta" enctype="multipart/form-data" novalidate>
                         <div class="campo campo-full">
@@ -91,7 +140,7 @@
 
                         <div class="campo">
                             <label class="form-label">CEP: </label>
-                            <input class="form-control" type="text" id="cep" name="cep" value="<?= esc($dadosFormulario['cep'] ?? '') ?>" maxlength="8" placeholder="00000000" required>
+                            <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{8}" id="cep" name="cep" value="<?= esc($dadosFormulario['cep'] ?? '') ?>" maxlength="8" placeholder="00000000" required>
                         </div>
                         <div class="campo campo-2">
                             <label class="form-label">Endereço: </label>
