@@ -16,7 +16,7 @@
     <?php
       $dir = "../Dados/cliente.txt";
 
-      $rotulos = ['Nome', 'CPF', 'RG', 'Data Nasc.', 'CEP', 'Endereço', 'Número', 'Complem.', 'Bairro', 'Cidade', 'Estado', 'Telefone', 'E-mail'];
+      $rotulos = ['Nome', 'CPF', 'RG', 'Data Nasc.', 'CEP', 'Endereço', 'Número', 'Complem.', 'Bairro', 'Cidade', 'Estado', 'Telefone', 'E-mail', 'Foto'];
 
       if (file_exists($dir)) {
           $linhas = file($dir, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -32,7 +32,20 @@
               echo '<h5 class="card-title">Cliente ' . ($i + 1) . '</h5>';
 
               foreach ($rotulos as $n => $rotulo) {
-                  echo "<p class='mb-1'><strong>$rotulo:</strong> " . htmlspecialchars($dados[$n] ?? '') . "</p>";
+                  $valor = $dados[$n] ?? '';
+
+                  if ($rotulo === 'Foto') {
+                      if ($valor !== '') {
+                          echo "<p class='mb-1'><strong>Foto:</strong><br><img src='../Uploads/clientes/" . rawurlencode($valor) . "' alt='Foto' style='max-width:150px; border-radius:8px;'></p>";
+                      }
+                      continue;
+                  }
+
+                  if ($rotulo === 'Preço' && $valor !== '') {
+                      $valor = 'R$ ' . number_format((float)$valor, 2, ',', '.');
+                  }
+
+                  echo "<p class='mb-1'><strong>$rotulo:</strong> " . htmlspecialchars($valor) . "</p>";
               }
 
               echo '</div></div>';

@@ -3,27 +3,38 @@
   include __DIR__ . '/funções.php';
 
   $erro     = null;
+  $erroFoto = null;
 
   if (isset($_POST['limpar'])) {
     unset($_SESSION['cliente_form']);
   } elseif (!empty($_POST)) {
     $erro = validarCPF($_POST['cpf'] ?? '');
 
-    if ($erro) {
+    if (!$erro) {
+      list($foto, $erroFoto) = enviarImagem('foto', __DIR__ . '/../Uploads/clientes/');
+    }
+
+    if ($erro || $erroFoto) {
       $_SESSION['cliente_form'] = $_POST;
     } else {
       unset($_SESSION['cliente_form']);
       echo "<script>alert('Aviso: Operação realizada com sucesso!');</script>";
-      $cliente = array($_POST['nome'], ", ", $_POST['cpf'], ", ", $_POST['rg'], ", ", $_POST['dt'], ", ", $_POST['cep'], ", ", $_POST['endereco'], ", ", $_POST['numero'], ", ", $_POST['complemento'], ", ", $_POST['bairro'], ", ", $_POST['cidade'], ", ", $_POST['estado'], ", ", $_POST['tel'], ", ", $_POST['email'], ";", "\n");
+
+      $camposRegistro = array('nome', 'cpf', 'rg', 'dt', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tel', 'email');
+      $valores = array();
+      foreach ($camposRegistro as $campo) {
+        $valores[] = limparCampo($_POST[$campo] ?? '');
+      }
+      $valores[] = $foto;
+      $registro = implode(", ", $valores) . ";\n";
 
       $dir = "../Dados/cliente.txt";
 
-      file_put_contents($dir, $cliente, FILE_APPEND | LOCK_EX);
+      file_put_contents($dir, $registro, FILE_APPEND | LOCK_EX);
     }
   }
 
   $dadosFormulario = $_SESSION['cliente_form'] ?? [];
-
   if (!function_exists('esc')) {
     function esc($v) {
       return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
@@ -59,7 +70,7 @@
                     <div class="alert alert-danger" role="alert">CPF inválido. Verifique os dígitos e tente novamente.</div>
                   <?php endif; ?>
 
-                    <form action="#" method="POST" class="needs-validation form-carta" novalidate>
+                    <form action="#" method="POST" class="needs-validation form-carta" enctype="multipart/form-data" novalidate>
                         <div class="campo campo-full">
                             <label class="form-label">Nome: </label>
                             <input class="form-control" type="text" id="nome" name="nome" value="<?= esc($dadosFormulario['nome'] ?? '') ?>" required>
@@ -117,7 +128,14 @@
                             <label class="form-label">Email: </label>
                             <input class="form-control" type="email" id="email" name="email" value="<?= esc($dadosFormulario['email'] ?? '') ?>" required>
                         </div>
-                        <div class="botoes">
+                        <?php if ($erroFoto): ?>
+            <div class="campo-full"><div class="alert alert-danger" role="alert"><?= esc($erroFoto) ?></div></div>
+            <?php endif; ?>
+            <div class="campo campo-2">
+                <label class="form-label">Foto (JPG, PNG, GIF ou WEBP, até 2 MB): </label>
+                <input class="form-control" type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/gif,image/webp" required>
+            </div>
+            <div class="botoes">
                             <input type="submit" value="Cadastrar" class="btn btn-primary">
                             <button type="submit" name="limpar" value="1" class="btn btn-warning">Limpar</button>
                         </div>
@@ -198,6 +216,16 @@
             });
         } else {
           clearAddressFields();
+        }
+      });
+    </script>
+    <script>
+      const campoFoto = document.getElementById('foto');
+      campoFoto.addEventListener('change', function () {
+        const arq = this.files[0];
+        if (arq && arq.size > 2 * 1024 * 1024) {
+          alert('A imagem deve ter no máximo 2 MB.');
+          this.value = '';
         }
       });
     </script>

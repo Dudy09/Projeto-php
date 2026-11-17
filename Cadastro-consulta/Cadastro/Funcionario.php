@@ -1,7 +1,9 @@
 ﻿<?php
   session_start();
+  include __DIR__ . '/funções.php';
 
   $erro = false;
+  $erroFoto = null;
   $sucesso = false;
   $camposObrigatorios = ['nome', 'cargo', 'departamento', 'admissao', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'tel', 'email'];
 
@@ -15,12 +17,23 @@
       }
     }
 
-    if ($erro) {
+    if (!$erro) {
+      list($foto, $erroFoto) = enviarImagem('foto', __DIR__ . '/../Uploads/funcionarios/');
+    }
+
+    if ($erro || $erroFoto) {
       $_SESSION['funcionario_form'] = $_POST;
     } else {
       unset($_SESSION['funcionario_form']);
       $sucesso = true;
-      $registro = array($_POST['nome'], ", ", $_POST['cargo'], ", ", $_POST['departamento'], ", ", $_POST['admissao'], ", ", $_POST['cep'], ", ", $_POST['endereco'], ", ", $_POST['numero'], ", ", $_POST['complemento'], ", ", $_POST['bairro'], ", ", $_POST['cidade'], ", ", $_POST['estado'], ", ", $_POST['tel'], ", ", $_POST['email'], ";", "\n");
+
+      $camposRegistro = array('nome', 'cargo', 'departamento', 'admissao', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'tel', 'email');
+      $valores = array();
+      foreach ($camposRegistro as $campo) {
+        $valores[] = limparCampo($_POST[$campo] ?? '');
+      }
+      $valores[] = $foto;
+      $registro = implode(", ", $valores) . ";\n";
 
       $dir = "../Dados/funcionario.txt";
 
@@ -54,7 +67,7 @@
     <div class="container mt-4">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <form action="#" method="POST" class="needs-validation form-carta" novalidate>
+          <form action="#" method="POST" class="needs-validation form-carta" enctype="multipart/form-data" novalidate>
             <div class="campo campo-full">
                 <label class="form-label">Nome: </label>
                 <input class="form-control" type="text" id="nome" name="nome" value="<?= esc($dadosFormulario['nome'] ?? '') ?>" required>
@@ -106,6 +119,13 @@
             <div class="campo campo-2">
                 <label class="form-label">Email: </label>
                 <input class="form-control" type="email" id="email" name="email" value="<?= esc($dadosFormulario['email'] ?? '') ?>" required>
+            </div>
+            <?php if ($erroFoto): ?>
+            <div class="campo-full"><div class="alert alert-danger" role="alert"><?= esc($erroFoto) ?></div></div>
+            <?php endif; ?>
+            <div class="campo campo-2">
+                <label class="form-label">Foto (JPG, PNG, GIF ou WEBP, até 2 MB): </label>
+                <input class="form-control" type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/gif,image/webp" required>
             </div>
             <div class="botoes">
                 <input type="submit" value="Cadastrar" class="btn btn-primary">
@@ -170,6 +190,16 @@
             });
         } else {
           clearAddressFields();
+        }
+      });
+    </script>
+    <script>
+      const campoFoto = document.getElementById('foto');
+      campoFoto.addEventListener('change', function () {
+        const arq = this.files[0];
+        if (arq && arq.size > 2 * 1024 * 1024) {
+          alert('A imagem deve ter no máximo 2 MB.');
+          this.value = '';
         }
       });
     </script>

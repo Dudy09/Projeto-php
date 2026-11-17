@@ -1,40 +1,72 @@
 ﻿<?php
   session_start();
+  include __DIR__ . '/funções.php';
 
   $erro = false;
+  $erroFoto = null;
   $sucesso = false;
-  $camposObrigatorios = ['nome', 'codigo', 'categoria', 'preco', 'quantidade', 'fornecedor'];
+  $camposObrigatorios = ['nome', 'codigo', 'categoria', 'marca', 'fornecedor', 'preco', 'quantidade', 'peso', 'unidade', 'descricao'];
+  $categorias = ['Alimentos', 'Bebidas', 'Limpeza', 'Higiene', 'Eletrônicos', 'Vestuário', 'Outros'];
+  $unidades = ['Unidade', 'Kg', 'Litro', 'Caixa'];
+  $caracteristicasValidas = ['Perecível', 'Frágil', 'Em promoção', 'Importado'];
 
   if (isset($_POST['limpar'])) {
     unset($_SESSION['produto_form']);
   } elseif (!empty($_POST)) {
     foreach ($camposObrigatorios as $campo) {
-      if (!isset($_POST[$campo]) || trim($_POST[$campo]) === '') {
+      if (!isset($_POST[$campo]) || !is_string($_POST[$campo]) || trim($_POST[$campo]) === '') {
         $erro = true;
         break;
       }
     }
 
-    if ($erro) {
+    $caracteristicas = $_POST['caracteristicas'] ?? [];
+    if (!is_array($caracteristicas) || array_diff($caracteristicas, $caracteristicasValidas)) {
+      $erro = true;
+      $caracteristicas = [];
+    }
+
+    if (!$erro) {
+      if (!in_array($_POST['categoria'], $categorias, true) || !in_array($_POST['unidade'], $unidades, true)) {
+        $erro = true;
+      }
+
+      foreach (['preco', 'quantidade', 'peso'] as $campo) {
+        if (!is_numeric($_POST[$campo]) || $_POST[$campo] < 0) {
+          $erro = true;
+        }
+      }
+    }
+
+    if (!$erro) {
+      list($foto, $erroFoto) = enviarImagem('foto', __DIR__ . '/../Uploads/produtos/');
+    }
+
+    if ($erro || $erroFoto) {
       $_SESSION['produto_form'] = $_POST;
     } else {
       unset($_SESSION['produto_form']);
       $sucesso = true;
-      $produto = array(
-        'nome' => $_POST['nome'],
-        'codigo' => $_POST['codigo'],
-        'categoria' => $_POST['categoria'],
-        'preco' => $_POST['preco'],
-        'quantidade' => $_POST['quantidade'],
-        'validade' => $_POST['validade'] ?? '',
-        'fornecedor' => $_POST['fornecedor']
-      );
 
-      $registro = array($_POST['nome'], ", ", $_POST['codigo'], ", ", $_POST['categoria'], ", ", $_POST['preco'], ", ", $_POST['quantidade'], ", ", $_POST['validade'] ?? '', ", ", $_POST['fornecedor'], ";", "\n");
+      $produto = array(
+        'nome' => limparCampo($_POST['nome']),
+        'codigo' => limparCampo($_POST['codigo']),
+        'categoria' => limparCampo($_POST['categoria']),
+        'marca' => limparCampo($_POST['marca']),
+        'fornecedor' => limparCampo($_POST['fornecedor']),
+        'preco' => limparCampo($_POST['preco']),
+        'quantidade' => limparCampo($_POST['quantidade']),
+        'peso' => limparCampo($_POST['peso']),
+        'validade' => limparCampo($_POST['validade'] ?? ''),
+        'unidade' => limparCampo($_POST['unidade']),
+        'caracteristicas' => implode(' / ', $caracteristicas),
+        'descricao' => limparCampo($_POST['descricao']),
+        'foto' => $foto
+      );
 
       $dir = "../Dados/produto.txt";
 
-      file_put_contents($dir, $registro, FILE_APPEND | LOCK_EX);
+      file_put_contents($dir, implode(", ", $produto) . ";\n", FILE_APPEND | LOCK_EX);
     }
   }
 
@@ -44,6 +76,7 @@
       return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
     }
   }
+  $caracteristicasMarcadas = (isset($dadosFormulario['caracteristicas']) && is_array($dadosFormulario['caracteristicas'])) ? $dadosFormulario['caracteristicas'] : [];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -64,7 +97,7 @@
     <div class="container mt-4">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <form action="#" method="POST" class="needs-validation form-carta" novalidate>
+          <form action="#" method="POST" class="needs-validation form-carta" enctype="multipart/form-data" novalidate>
             <div class="campo campo-full">
                 <label class="form-label">Nome do Produto: </label>
                 <input class="form-control" type="text" id="nome" name="nome" value="<?= esc($dadosFormulario['nome'] ?? '') ?>" required>
@@ -75,7 +108,16 @@
             </div>
             <div class="campo">
                 <label class="form-label">Categoria: </label>
-                <input class="form-control" type="text" id="categoria" name="categoria" value="<?= esc($dadosFormulario['categoria'] ?? '') ?>" required>
+                <select class="form-select" id="categoria" name="categoria" required>
+                    <option value="">Selecione...</option>
+                    <?php foreach ($categorias as $cat): ?>
+                    <option value="<?= esc($cat) ?>" <?= (($dadosFormulario['categoria'] ?? '') === $cat) ? 'selected' : '' ?>><?= esc($cat) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="campo">
+                <label class="form-label">Marca: </label>
+                <input class="form-control" type="text" id="marca" name="marca" value="<?= esc($dadosFormulario['marca'] ?? '') ?>" required>
             </div>
             <div class="campo">
                 <label class="form-label">Fornecedor: </label>
@@ -83,15 +125,52 @@
             </div>
             <div class="campo">
                 <label class="form-label">Preço: </label>
-                <input class="form-control" type="number" id="preco" name="preco" value="<?= esc($dadosFormulario['preco'] ?? '') ?>" step="0.01" required>
+                <input class="form-control" type="number" id="preco" name="preco" value="<?= esc($dadosFormulario['preco'] ?? '') ?>" step="0.01" min="0" required>
             </div>
             <div class="campo">
                 <label class="form-label">Quantidade em Estoque: </label>
-                <input class="form-control" type="number" id="quantidade" name="quantidade" value="<?= esc($dadosFormulario['quantidade'] ?? '') ?>" required>
+                <input class="form-control" type="number" id="quantidade" name="quantidade" value="<?= esc($dadosFormulario['quantidade'] ?? '') ?>" min="0" required>
+            </div>
+            <div class="campo">
+                <label class="form-label">Peso (kg): </label>
+                <input class="form-control" type="number" id="peso" name="peso" value="<?= esc($dadosFormulario['peso'] ?? '') ?>" step="0.001" min="0" required>
             </div>
             <div class="campo">
                 <label class="form-label">Data de Validade: </label>
                 <input class="form-control" type="date" id="validade" name="validade" value="<?= esc($dadosFormulario['validade'] ?? '') ?>">
+            </div>
+            <div class="campo">
+                <label class="form-label d-block">Unidade de venda: </label>
+                <div class="grupo-opcoes">
+                    <?php foreach ($unidades as $i => $un): ?>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="unidade" id="unidade<?= $i ?>" value="<?= esc($un) ?>" <?= (($dadosFormulario['unidade'] ?? '') === $un) ? 'checked' : '' ?> required>
+                        <label class="form-check-label" for="unidade<?= $i ?>"><?= esc($un) ?></label>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="campo campo-2">
+                <label class="form-label d-block">Características: </label>
+                <div class="grupo-opcoes">
+                    <?php foreach ($caracteristicasValidas as $i => $car): ?>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="caracteristicas[]" id="car<?= $i ?>" value="<?= esc($car) ?>" <?= in_array($car, $caracteristicasMarcadas, true) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="car<?= $i ?>"><?= esc($car) ?></label>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="campo campo-full">
+                <label class="form-label">Descrição: </label>
+                <textarea class="form-control" id="descricao" name="descricao" rows="3" required><?= esc($dadosFormulario['descricao'] ?? '') ?></textarea>
+            </div>
+            <?php if ($erroFoto): ?>
+            <div class="campo-full"><div class="alert alert-danger" role="alert"><?= esc($erroFoto) ?></div></div>
+            <?php endif; ?>
+            <div class="campo campo-2">
+                <label class="form-label">Foto (JPG, PNG, GIF ou WEBP, até 2 MB): </label>
+                <input class="form-control" type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/gif,image/webp" required>
             </div>
             <div class="campo-full botoes">
                 <input type="submit" value="Cadastrar" class="btn btn-primary">
@@ -104,7 +183,7 @@
 
     <?php if ($erro): ?>
     <div class="container mt-3">
-      <div class="alert alert-danger" role="alert">Preencha todos os campos obrigatórios.</div>
+      <div class="alert alert-danger" role="alert">Preencha todos os campos obrigatórios corretamente.</div>
     </div>
     <?php endif; ?>
 
@@ -121,6 +200,16 @@
           event.stopPropagation();
           form.classList.add('was-validated');
           alert('Preencha todos os campos obrigatórios antes de enviar.');
+        }
+      });
+    </script>
+    <script>
+      const campoFoto = document.getElementById('foto');
+      campoFoto.addEventListener('change', function () {
+        const arq = this.files[0];
+        if (arq && arq.size > 2 * 1024 * 1024) {
+          alert('A imagem deve ter no máximo 2 MB.');
+          this.value = '';
         }
       });
     </script>

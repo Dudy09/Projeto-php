@@ -98,6 +98,8 @@
               <li><a class="dropdown-item" href="27-04-Laços-de-repetição/senha.php">senha</a></li>
               <li><a class="dropdown-item" href="27-04-Laços-de-repetição/mega_sena.php">mega sena</a></li>
               <li><a class="dropdown-item" href="28-07-funções/index.php">Funções em php</a></li>
+              <li><a class="dropdown-item" href="LogiExpress/index.php">LogiExpress</a></li>
+              <li><a class="dropdown-item" href="update/index.php">Update</a></li>
             </ul>
           </li>
         </ul>

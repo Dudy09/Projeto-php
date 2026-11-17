@@ -16,7 +16,7 @@
     <?php
       $dir = "../Dados/produto.txt";
 
-      $rotulos = ['Nome', 'Código', 'Categoria', 'Preço', 'Quantidade', 'Validade', 'Fornecedor'];
+      $rotulos = ['Nome', 'Código', 'Categoria', 'Marca', 'Fornecedor', 'Preço', 'Quantidade', 'Peso (kg)', 'Validade', 'Unidade', 'Características', 'Descrição', 'Foto'];
 
       if (file_exists($dir)) {
           $linhas = file($dir, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -33,9 +33,18 @@
 
               foreach ($rotulos as $n => $rotulo) {
                   $valor = $dados[$n] ?? '';
+
+                  if ($rotulo === 'Foto') {
+                      if ($valor !== '') {
+                          echo "<p class='mb-1'><strong>Foto:</strong><br><img src='../Uploads/produtos/" . rawurlencode($valor) . "' alt='Foto' style='max-width:150px; border-radius:8px;'></p>";
+                      }
+                      continue;
+                  }
+
                   if ($rotulo === 'Preço' && $valor !== '') {
                       $valor = 'R$ ' . number_format((float)$valor, 2, ',', '.');
                   }
+
                   echo "<p class='mb-1'><strong>$rotulo:</strong> " . htmlspecialchars($valor) . "</p>";
               }
 

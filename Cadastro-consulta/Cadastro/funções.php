@@ -87,4 +87,68 @@ function validarCNPJ($cnpj) {
     return true;
 }
 
+function limparCampo($valor) {
+    // Tira quebras de linha e vírgula+espaço, que são usados como separador no .txt
+    $valor = trim((string)$valor);
+    $valor = preg_replace('/\s+/', ' ', $valor);
+    return str_replace(', ', ',', $valor);
+}
+
+function enviarImagem($campo, $pasta) {
+    // Retorna array: [nome do arquivo salvo, mensagem de erro]
+    $tamanhoMaximo = 2 * 1024 * 1024; // 2 MB
+    $tiposPermitidos = array(
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp'
+    );
+
+    if (!isset($_FILES[$campo]) || $_FILES[$campo]['error'] === UPLOAD_ERR_NO_FILE) {
+        return array(null, 'Selecione uma imagem.');
+    }
+
+    $arquivo = $_FILES[$campo];
+
+    if ($arquivo['error'] === UPLOAD_ERR_INI_SIZE || $arquivo['error'] === UPLOAD_ERR_FORM_SIZE) {
+        return array(null, 'A imagem é muito grande! O tamanho máximo permitido é de 2 MB.');
+    }
+
+    if ($arquivo['error'] !== UPLOAD_ERR_OK) {
+        return array(null, 'Erro ao enviar a imagem.');
+    }
+
+    if ($arquivo['size'] > $tamanhoMaximo) {
+        return array(null, 'A imagem é muito grande! O tamanho máximo permitido é de 2 MB.');
+    }
+
+    if (!is_uploaded_file($arquivo['tmp_name'])) {
+        return array(null, 'Erro ao enviar a imagem.');
+    }
+
+    // getimagesize só retorna dados se o conteúdo for realmente uma imagem
+    $info = @getimagesize($arquivo['tmp_name']);
+    if ($info === false) {
+        return array(null, 'O arquivo enviado não é uma imagem válida.');
+    }
+
+    if (!isset($tiposPermitidos[$info['mime']])) {
+        return array(null, 'Apenas imagens JPG, PNG, GIF ou WEBP são permitidas.');
+    }
+
+    if (!is_dir($pasta)) {
+        mkdir($pasta, 0755, true);
+    }
+
+    // Nome novo (data + código aleatório) para nunca sobrescrever outro arquivo
+    // A extensão vem do tipo real da imagem, não do nome enviado pelo usuário
+    $novoNome = date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.' . $tiposPermitidos[$info['mime']];
+
+    if (!move_uploaded_file($arquivo['tmp_name'], rtrim($pasta, '/\\') . '/' . $novoNome)) {
+        return array(null, 'Erro ao salvar a imagem.');
+    }
+
+    return array($novoNome, null);
+}
+
 ?>
